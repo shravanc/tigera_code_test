@@ -31,6 +31,14 @@ python main.py
 python predict.py
 ```
 
+# Malware family considered:
+```
+banjori
+chinad
+corebot
+fobber
+```
+
 # Solution Delivery:
 ## Document the approach, pros and cons with the selected approach.
  - approach: 
