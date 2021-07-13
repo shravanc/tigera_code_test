@@ -7,21 +7,29 @@
 # Configuration:
 
 ## main.py
+```
 EPOCHS = 100
 MAX_LENGTH = 100
 BATCH_SIZE = 64
 SHUFFLE_BUFFER = 50
 MODEL_PATH = "/tmp/models/"
+```
 
 ## utils.py
+```
 GENUINE_DOMAIN_PATH = '../datasets/genuine_domains/'
 MALWARE_DOMAIN_PATH = '../datasets/malware_domains/'
+```
 
 # Train:
+```
 python main.py
+```
 
 # Prediction:
+```
 python predict.py
+```
 
 # Solution Delivery:
 ## Document the approach, pros and cons with the selected approach.
