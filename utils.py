@@ -3,6 +3,8 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.python.keras.preprocessing import sequence
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 
 GENUINE_DOMAIN_PATH = '../datasets/genuine_domains/'
@@ -21,7 +23,7 @@ def domain_to_ints(domain):
     ]
 
 
-def prep_data(data, max_length=75):
+def prep_data(data, max_length):
     return sequence.pad_sequences(
         np.array([domain_to_ints(x) for x in data]), maxlen=max_length
     )
@@ -70,4 +72,22 @@ def get_data(max_length, batch_size, shuffle_buffer=50):
     return train_dataset, valid_dataset
 
 
+def plot_curve(history):
+    mae = history.history['mae']
+    val_mae = history.history['val_mae']
+    epochs = range(len(mae))
 
+    plt.figure(figsize=(15, 10))
+    plt.plot(epochs, mae, label=['Training MAE'])
+    plt.plot(epochs, val_mae, label=['Validation MAE'])
+    plt.legend()
+    plt.show()
+
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    plt.figure(figsize=(15, 10))
+    plt.plot(epochs, loss, label=['Training Loss'])
+    plt.plot(epochs, val_loss, label=['Validation Loss'])
+    plt.legend()
+    plt.show()

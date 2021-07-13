@@ -1,8 +1,7 @@
-from utils import get_data, prep_data
-import matplotlib.pyplot as plt
+from utils import get_data, plot_curve
 
 import tensorflow as tf
-from tensorflow.python.keras.callbacks import (EarlyStopping, ModelCheckpoint)
+from tensorflow.python.keras.callbacks import (EarlyStopping, ModelCheckpoint, TensorBoard)
 from tensorflow.python.keras.layers import (Conv1D, MaxPooling1D, Embedding,)
 from tensorflow.python.keras.layers import Input, Flatten, Dense, Dropout
 from tensorflow.python.keras.models import Model
@@ -48,7 +47,7 @@ def build_model():
 
 def get_callbacks():
     early_stopping = EarlyStopping(monitor="val_mae", patience=5)
-    saver = ModelCheckpoint(MODEL_PATH, save_best_only=True, monitor="val_mae")
+    # saver = ModelCheckpoint(MODEL_PATH, save_best_only=True, monitor="val_mae")
     # grapher = TensorBoard(log_dir=GRAPH_LOG, write_graph=True)
     return [early_stopping] #, saver] #, grapher]
 
@@ -64,31 +63,12 @@ def run_training(model, train_dataset, valid_dataset):
     return results
 
 
-
 def train(train_dataset, valid_dataset):
     model = build_model()
     history = run_training(model, train_dataset, valid_dataset)
-    mae = history.history['mae']
-    val_mae = history.history['val_mae']
-    epochs = range(len(mae))
-
-    plt.figure(figsize=(15, 10))
-    plt.plot(epochs, mae, label=['Training MAE'])
-    plt.plot(epochs, val_mae, label=['Validation MAE'])
-    plt.legend()
-    plt.show()
-
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-
-    plt.figure(figsize=(15, 10))
-    plt.plot(epochs, loss, label=['Training Loss'])
-    plt.plot(epochs, val_loss, label=['Validation Loss'])
-    plt.legend()
-    plt.show()
-
-
+    # plot_curve(history)
     tf.keras.models.save_model(model, MODEL_PATH)
+
 
 def main():
     train_dataset, valid_dataset = get_data(
@@ -102,17 +82,5 @@ def main():
     )
 
 
-def predict(sample_domain):
-    inp = prep_data([sample_domain], MAX_LENGTH)
-    print(inp)
-    model = tf.keras.models.load_model(MODEL_PATH)
-    prediction = model.predict(inp)
-    print(prediction)
+# main()
 
-
-
-main()
-
-# sample_domain = "google.com"
-# sample_domain = "kwtoestnessbiophysicalohax.com"
-# predict(sample_domain)
