@@ -39,6 +39,12 @@ corebot
 fobber
 ```
 
+# Platfor Develpoed:
+```
+MacOS: BigSur
+M1 Chip
+```
+
 # Solution Delivery:
 ## Document the approach, pros and cons with the selected approach.
  - approach: 
