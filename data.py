@@ -66,26 +66,13 @@ def malware_data():
     df = pd.DataFrame()
     for name in glob.glob(MALWARE_DOMAIN_PATH + '*'):
         temp = pd.read_csv(name, names=['domain', 'flag'])
-        temp['flag'] = 1
+        temp['flag'] = 0
         df = pd.concat([df, temp])
 
     return df
 
 
-def get_and_split_data(max_length=255):
-    """
-    Loop over genuine domain file lists and malware domain file lists
-    returns training set and validation set
-    """
-    df = pd.DataFrame()
-    for name in glob.glob(GENUINE_DOMAIN_PATH + '*'):
-        temp = pd.read_csv(name, names=['domain', 'flag'])
-        temp['flag'] = 1
-        df = pd.concat([df, temp])
-
-    for name in glob.glob(MALWARE_DOMAIN_PATH + '*'):
-        df = pd.concat([df, pd.read_csv(name, names=['domain', 'flag'])])
-
+def split_data(df, max_length=255):
     t_df = df.sample(frac=0.85, random_state=1)
     v_df = df.drop(t_df.index)
 
@@ -93,6 +80,19 @@ def get_and_split_data(max_length=255):
     val_x, val_y = prep_dataframe(v_df, max_length)
 
     return t_x, val_x, t_y, val_y
+
+
+def gather_data():
+    """
+    Loop over genuine domain file lists and malware domain file lists
+    returns training set and validation set
+    """
+    genuine_df = genuine_data()
+    malware_df = malware_data()
+
+    df = pd.concat([genuine_df, malware_df])
+
+    return df
 
 
 def prepare_dataset(data, labels, batch=32, shuffle_buffer=50):
@@ -106,7 +106,8 @@ def prepare_dataset(data, labels, batch=32, shuffle_buffer=50):
 
 
 def get_data(max_length, batch_size, shuffle_buffer=50):
-    t_x, val_x, t_y, val_y = get_and_split_data(max_length)
+    df = gather_data()
+    t_x, val_x, t_y, val_y = split_data(df, max_length)
 
     train_dataset = prepare_dataset(t_x, t_y, batch_size, shuffle_buffer)
     valid_dataset = prepare_dataset(val_x, val_y, batch_size, shuffle_buffer)
@@ -114,24 +115,15 @@ def get_data(max_length, batch_size, shuffle_buffer=50):
     return train_dataset, valid_dataset
 
 
-def plot_curve(history):
-    mae = history.history['mae']
-    val_mae = history.history['val_mae']
-    epochs = range(len(mae))
+def plot_curve_v2(history, metric):
+    metrics = history.history[metric]
+    val_metrics = history.history[f"val_{metric}"]
+    epochs = range(len(metrics))
 
     plt.figure(figsize=(15, 10))
-    plt.plot(epochs, mae, label=['Training MAE'])
-    plt.plot(epochs, val_mae, label=['Validation MAE'])
+    plt.plot(epochs, metrics, label=[f"Training {metric}"])
+    plt.plot(epochs, val_metrics, label=[f"Validation {metric}"])
     plt.legend()
-    plt.show()
 
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
 
-    plt.figure(figsize=(15, 10))
-    plt.plot(epochs, loss, label=['Training Loss'])
-    plt.plot(epochs, val_loss, label=['Validation Loss'])
-    plt.legend()
-    # plt.show()
 
-# print(prep_data(["abc"]))
